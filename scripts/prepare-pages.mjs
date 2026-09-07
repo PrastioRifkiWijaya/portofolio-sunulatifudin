@@ -76,12 +76,12 @@ fs.copyFileSync(workerSrc, workerDest);
 console.log(`  Patching _worker.js for debugging...`);
 let workerContent = fs.readFileSync(workerDest, "utf8");
 workerContent = workerContent.replace(
-  "async fetch(request, env, ctx) {\n        return runWithCloudflareRequestContext(request, env, ctx, async () => {",
-  `async fetch(request, env, ctx) {\n        try {\n            return await runWithCloudflareRequestContext(request, env, ctx, async () => {`
+  "async fetch(request, env, ctx) {\n        try {\n            return await runWithCloudflareRequestContext(request, env, ctx, async () => {",
+  `async fetch(request, env, ctx) {\n        let capturedError = "";\n        const originalError = console.error;\n        console.error = (...args) => {\n            if (args.length > 0 && args[0] && args[0].stack) capturedError += args[0].stack + "\\n";\n            else capturedError += args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(" ") + "\\n";\n            originalError.apply(console, args);\n        };\n        try {\n            const res = await runWithCloudflareRequestContext(request, env, ctx, async () => {`
 );
 workerContent = workerContent.replace(
-  "            return handler(reqOrResp, env, ctx, request.signal);\n        });\n    },\n};",
-  `            return handler(reqOrResp, env, ctx, request.signal);\n        });\n        } catch (err) {\n            return new Response("DEBUG ERROR: " + (err.stack || err.message || String(err)), { status: 500, headers: { "Content-Type": "text/plain" } });\n        }\n    },\n};`
+  "            return handler(reqOrResp, env, ctx, request.signal);\n        });\n        } catch (err) {\n            return new Response(\"DEBUG ERROR: \" + (err.stack || err.message || String(err)), { status: 500, headers: { \"Content-Type\": \"text/plain\" } });\n        }\n    },\n};",
+  `            return handler(reqOrResp, env, ctx, request.signal);\n        });\n            console.error = originalError;\n            if (res && res.status === 500 && capturedError) {\n                return new Response("DEBUG NEXTJS ERROR:\\n" + capturedError, { status: 500, headers: { "Content-Type": "text/plain" } });\n            }\n            return res;\n        } catch (err) {\n            console.error = originalError;\n            return new Response("DEBUG ERROR: " + (err.stack || err.message || String(err)), { status: 500, headers: { "Content-Type": "text/plain" } });\n        }\n    },\n};`
 );
 fs.writeFileSync(workerDest, workerContent, "utf8");
 
