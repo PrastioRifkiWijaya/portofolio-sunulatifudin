@@ -21,8 +21,8 @@
  *   - All relative imports from _worker.js resolve to the copied runtime dirs
  */
 
-const fs = require("fs");
-const path = require("path");
+import fs from "fs";
+import path from "path";
 
 const OPEN_NEXT_DIR = path.resolve(".open-next");
 const ASSETS_DIR = path.join(OPEN_NEXT_DIR, "assets");
@@ -71,5 +71,18 @@ const workerSrc = path.join(OPEN_NEXT_DIR, "worker.js");
 const workerDest = path.join(ASSETS_DIR, "_worker.js");
 console.log(`  Copying worker.js -> assets/_worker.js`);
 fs.copyFileSync(workerSrc, workerDest);
+
+// 3. Patch _worker.js to return detailed error messages for debugging
+console.log(`  Patching _worker.js for debugging...`);
+let workerContent = fs.readFileSync(workerDest, "utf8");
+workerContent = workerContent.replace(
+  "async fetch(request, env, ctx) {\n        return runWithCloudflareRequestContext(request, env, ctx, async () => {",
+  `async fetch(request, env, ctx) {\n        try {\n            return await runWithCloudflareRequestContext(request, env, ctx, async () => {`
+);
+workerContent = workerContent.replace(
+  "            return handler(reqOrResp, env, ctx, request.signal);\n        });\n    },\n};",
+  `            return handler(reqOrResp, env, ctx, request.signal);\n        });\n        } catch (err) {\n            return new Response("DEBUG ERROR: " + (err.stack || err.message || String(err)), { status: 500, headers: { "Content-Type": "text/plain" } });\n        }\n    },\n};`
+);
+fs.writeFileSync(workerDest, workerContent, "utf8");
 
 console.log("\n✓ Cloudflare Pages output prepared at .open-next/assets/");
