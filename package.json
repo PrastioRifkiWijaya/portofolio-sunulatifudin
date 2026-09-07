@@ -9,7 +9,7 @@
     "lint": "eslint",
     "seed": "tsx scripts/seed.ts",
     "build:worker": "opennextjs-cloudflare build",
-    "pages:build": "opennextjs-cloudflare build",
+    "pages:build": "opennextjs-cloudflare build && node -e \"require('fs').copyFileSync('.open-next/worker.js', '.open-next/assets/_worker.js')\"",
     "deploy:worker": "opennextjs-cloudflare build && wrangler deploy"
   },
   "dependencies": {
