@@ -10,7 +10,6 @@ import {
   CircleHelp,
   Play,
   Sparkles,
-  X,
   XCircle,
 } from "lucide-react";
 

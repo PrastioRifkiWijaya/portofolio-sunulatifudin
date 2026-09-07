@@ -2,7 +2,7 @@
 
 import { Section } from "@/components/Section";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, CheckCircle2, RotateCcw, FileText, ChevronRight } from "lucide-react";
+import { ArrowLeft, CheckCircle2, RotateCcw, FileText, ChevronRight } from "lucide-react";
 import { useState, useEffect } from "react";
 import { legislativeSteps } from "@/data/media-realita/alur-uu";
 import { motion, AnimatePresence } from "framer-motion";
