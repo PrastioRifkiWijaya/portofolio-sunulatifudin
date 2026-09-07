@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* Color Palette */
+  --color-primary: #056CF2;
+  --color-secondary: #18336C;
+  --color-accent1: #ABA2AF;
+  --color-accent2: #BABC9D;
+  --color-gold: #BF9556;
+
+  /* Background and Foreground mapped for Dark Mode */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  /* Fonts */
+  --font-title: var(--font-orborn), sans-serif;
+  --font-tagline: var(--font-surgena), serif;
+  --font-desc: var(--font-jakarta), sans-serif;
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #18336C;
+  /* Secondary color for text */
+}
+
+.dark {
+  --background: #0d1b38;
+  /* A dark shade of secondary */
+  --foreground: #ffffff;
+}
+
+/* Global Styles */
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-desc);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Custom Utilities */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
