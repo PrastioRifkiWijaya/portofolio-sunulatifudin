@@ -1,10 +1,22 @@
 import { Client, Databases } from "node-appwrite";
 
+function getRequiredEnv(name: string): string {
+  const value = process.env[name];
+  if (!value) {
+    throw new Error(`Missing required environment variable: ${name}`);
+  }
+  return value;
+}
+
 export const createAdminClient = () => {
+  const endpoint = getRequiredEnv("APPWRITE_ENDPOINT");
+  const projectId = getRequiredEnv("APPWRITE_PROJECT_ID");
+  const apiKey = getRequiredEnv("APPWRITE_API_KEY");
+
   const client = new Client()
-    .setEndpoint(process.env.APPWRITE_ENDPOINT!)
-    .setProject(process.env.APPWRITE_PROJECT_ID!)
-    .setKey(process.env.APPWRITE_API_KEY!);
+    .setEndpoint(endpoint)
+    .setProject(projectId)
+    .setKey(apiKey);
 
   return {
     get databases() {
@@ -14,10 +26,23 @@ export const createAdminClient = () => {
 };
 
 export const APPWRITE_CONFIG = {
-  dbId: process.env.APPWRITE_DATABASE_ID!,
-  colLevels: process.env.APPWRITE_EDUCATION_LEVELS_COLLECTION_ID!,
-  colGrades: process.env.APPWRITE_GRADES_COLLECTION_ID!,
-  colTopics: process.env.APPWRITE_TOPICS_COLLECTION_ID!,
-  colMaterials: process.env.APPWRITE_MATERIALS_COLLECTION_ID!,
-  colQuizzes: process.env.APPWRITE_QUIZZES_COLLECTION_ID!,
+  get dbId() {
+    return getRequiredEnv("APPWRITE_DATABASE_ID");
+  },
+  get colLevels() {
+    return getRequiredEnv("APPWRITE_EDUCATION_LEVELS_COLLECTION_ID");
+  },
+  get colGrades() {
+    return getRequiredEnv("APPWRITE_GRADES_COLLECTION_ID");
+  },
+  get colTopics() {
+    return getRequiredEnv("APPWRITE_TOPICS_COLLECTION_ID");
+  },
+  get colMaterials() {
+    return getRequiredEnv("APPWRITE_MATERIALS_COLLECTION_ID");
+  },
+  get colQuizzes() {
+    return getRequiredEnv("APPWRITE_QUIZZES_COLLECTION_ID");
+  },
 };
+

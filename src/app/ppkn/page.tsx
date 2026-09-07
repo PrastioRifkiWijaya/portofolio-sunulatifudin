@@ -4,6 +4,8 @@ import { PPKnService } from "@/services/ppkn.service";
 import { ChevronRight } from "lucide-react";
 import { FaBookOpenReader } from "react-icons/fa6";
 
+export const dynamic = "force-dynamic";
+
 export default async function PPKNPage() {
   const levels = await PPKnService.getActiveLevels();
 

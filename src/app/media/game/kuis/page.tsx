@@ -4,6 +4,8 @@ import { ArrowLeft } from "lucide-react";
 import { PPKnService } from "@/services/ppkn.service";
 import { FaBookOpenReader } from "react-icons/fa6";
 
+export const dynamic = "force-dynamic";
+
 export default async function KuisLevelPage() {
   const levels = await PPKnService.getActiveLevels();
 

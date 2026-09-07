@@ -3,6 +3,8 @@ import Link from "next/link";
 import { ArrowLeft, MonitorPlay } from "lucide-react";
 import { PPKnService } from "@/services/ppkn.service";
 
+export const dynamic = "force-dynamic";
+
 export default async function AudioVisualLevelPage() {
   const levels = await PPKnService.getActiveLevels();
 
