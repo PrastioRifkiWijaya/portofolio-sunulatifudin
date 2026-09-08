@@ -72,9 +72,12 @@ const workerDest = path.join(ASSETS_DIR, "_worker.js");
 console.log(`  Copying worker.js -> assets/_worker.js`);
 fs.copyFileSync(workerSrc, workerDest);
 
-// 3. Patch _worker.js to return detailed error messages for debugging
-console.log(`  Patching _worker.js for debugging...`);
+console.log(`  Patching _worker.js to remove Durable Object exports...`);
 let workerContent = fs.readFileSync(workerDest, "utf8");
+
+// Remove Durable Object exports which crash Cloudflare Pages if not bound in the dashboard
+workerContent = workerContent.replace(/export\s+\{.*\}\s+from\s+"[^"]*\.build\/durable-objects\/[^"]*";?/g, "// Removed DO export");
+workerContent = workerContent.replace(/\/\/\s*@ts-expect-error:[^\n]*\n\/\/ Removed DO export/g, "// Removed DO export");
 workerContent = workerContent.replace(
   "async fetch(request, env, ctx) {\n        try {\n            return await runWithCloudflareRequestContext(request, env, ctx, async () => {",
   `async fetch(request, env, ctx) {\n        let capturedError = "";\n        const originalError = console.error;\n        console.error = (...args) => {\n            if (args.length > 0 && args[0] && args[0].stack) capturedError += args[0].stack + "\\n";\n            else capturedError += args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(" ") + "\\n";\n            originalError.apply(console, args);\n        };\n        try {\n            const res = await runWithCloudflareRequestContext(request, env, ctx, async () => {`
