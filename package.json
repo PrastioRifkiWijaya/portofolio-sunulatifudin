@@ -4,13 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build --webpack",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "seed": "tsx scripts/seed.ts",
-    "build:worker": "opennextjs-cloudflare build",
-    "pages:build": "opennextjs-cloudflare build && node scripts/prepare-pages.mjs",
-    "deploy:worker": "opennextjs-cloudflare build && wrangler pages deploy .open-next/assets"
+    "seed": "tsx scripts/seed.ts"
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -26,7 +23,6 @@
     "tailwind-merge": "^3.6.0"
   },
   "devDependencies": {
-    "@opennextjs/cloudflare": "^1.20.6",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
@@ -35,7 +31,6 @@
     "eslint-config-next": "16.3.4",
     "tailwindcss": "^4",
     "tsx": "^4.23.13",
-    "typescript": "^5",
-    "wrangler": "^4.129.0"
+    "typescript": "^5"
   }
 }
