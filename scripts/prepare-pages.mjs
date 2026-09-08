@@ -80,7 +80,22 @@ workerContent = workerContent.replace(/export\s+\{.*\}\s+from\s+"[^"]*\.build\/d
 workerContent = workerContent.replace(/\/\/\s*@ts-expect-error:[^\n]*\n\/\/ Removed DO export/g, "// Removed DO export");
 workerContent = workerContent.replace(
   "async fetch(request, env, ctx) {\n        return runWithCloudflareRequestContext(request, env, ctx, async () => {",
-  `async fetch(request, env, ctx) {\n        let capturedError = "";\n        const originalError = console.error;\n        console.error = (...args) => {\n            if (args.length > 0 && args[0] && args[0].stack) capturedError += args[0].stack + "\\n";\n            else capturedError += args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(" ") + "\\n";\n            originalError.apply(console, args);\n        };\n        try {\n            const res = await runWithCloudflareRequestContext(request, env, ctx, async () => {`
+  `async fetch(request, env, ctx) {\n        let capturedError = "";\n        const originalError = console.error;\n        console.error = (...args) => {
+            const formatArg = (a) => {
+                if (a && a.stack) return String(a.stack);
+                if (a && a.message) return "Error: " + String(a.message);
+                if (typeof a === "object") {
+                    try {
+                        const props = Object.getOwnPropertyNames(a);
+                        if (props.length > 0) return JSON.stringify(a, props, 2);
+                    } catch(e) {}
+                    return JSON.stringify(a);
+                }
+                return String(a);
+            };
+            capturedError += args.map(formatArg).join(" ") + "\\n";
+            originalError.apply(console, args);
+        };\n        try {\n            const res = await runWithCloudflareRequestContext(request, env, ctx, async () => {`
 );
 workerContent = workerContent.replace(
   "            return handler(reqOrResp, env, ctx, request.signal);\n        });\n    },\n};",
