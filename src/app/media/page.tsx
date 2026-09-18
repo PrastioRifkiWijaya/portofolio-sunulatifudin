@@ -2,7 +2,7 @@
 
 import { Section } from "@/components/Section";
 import { useState } from "react";
-import { MonitorPlay, Gamepad2, Globe, ArrowRight, Dices } from "lucide-react";
+import { MonitorPlay, Gamepad2, Globe, ArrowRight, Dices, Users } from "lucide-react";
 import clsx from "clsx";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
@@ -39,7 +39,7 @@ export default function MediaPage() {
         <h1 className="font-title text-4xl font-bold text-secondary dark:text-white mb-4">
           Media Pembelajaran
         </h1>
-        <p className="font-desc text-gray-600 dark:text-gray-400 max-w-2xl">
+        <p className="font-desc text-gray-600 dark:text-gray-400 max-w-8xl">
           Eksplorasi berbagai jenis media pembelajaran inovatif untuk mendukung pengalaman belajar yang lebih menyenangkan.
         </p>
       </div>
@@ -74,7 +74,7 @@ export default function MediaPage() {
       </div>
 
       {/* Content Area */}
-      <div className="w-full max-w-5xl mx-auto min-h-87.5 p-8 md:p-12 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-3xl bg-gray-50/50 dark:bg-background/50 flex flex-col items-center justify-center text-center relative overflow-hidden">
+      <div className="w-full max-w-8xl mx-auto min-h-87.5 p-8 md:p-12 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-3xl bg-gray-50/50 dark:bg-background/50 flex flex-col items-center justify-center text-center relative overflow-hidden">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeFilter}
@@ -112,10 +112,10 @@ export default function MediaPage() {
                 <div className="flex flex-col items-center mb-8">
                   <Gamepad2 className="h-12 w-12 text-primary dark:text-gold mb-4" />
                   <h3 className="font-title text-2xl font-bold text-gray-800 dark:text-white mb-2">Permainan & Interaktif</h3>
-                  <p className="font-desc text-gray-500 max-w-md">Pilih mode pembelajaran interaktif yang ingin Anda mainkan.</p>
+                  <p className="font-desc text-gray-500 max-w-8xl">Pilih mode pembelajaran interaktif yang ingin Anda mainkan.</p>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-3xl mx-auto">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 w-full max-w-8xl mx-auto">
                   {/* Kartu Kuis */}
                   <Link href="/media/game/kuis" className="group flex flex-col items-center text-center p-8 rounded-2xl border-2 border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/50 hover:border-primary dark:hover:border-gold hover:shadow-xl transition-all duration-300">
                     <div className="h-16 w-16 rounded-full bg-primary/10 dark:bg-gold/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
@@ -125,6 +125,21 @@ export default function MediaPage() {
                     <p className="font-desc text-sm text-gray-500 mb-6 grow">Latih pemahaman PPKn melalui kuis interaktif.</p>
                     <div className="flex items-center text-primary dark:text-gold font-medium text-sm">
                       Mulai Kuis <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </Link>
+
+                  {/* Kartu Family 100 */}
+                  <Link href="/media/game/family-100" className="group flex flex-col items-center text-center p-8 rounded-2xl border-2 border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/50 hover:border-primary dark:hover:border-gold hover:shadow-xl transition-all duration-300 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 px-3 py-1 bg-gradient-to-r from-red-500 to-pink-500 text-white text-[10px] font-bold tracking-wider rounded-bl-xl uppercase shadow-md z-10">
+                      Baru!
+                    </div>
+                    <div className="h-16 w-16 rounded-full bg-primary/10 dark:bg-gold/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                      <Users className="h-8 w-8 text-primary dark:text-gold" />
+                    </div>
+                    <h4 className="font-title font-bold text-lg text-gray-800 dark:text-white mb-2">Family 100</h4>
+                    <p className="font-desc text-sm text-gray-500 mb-6 grow">Mainkan kuis survei tim gaya Family 100 untuk PPKn.</p>
+                    <div className="flex items-center text-primary dark:text-gold font-medium text-sm">
+                      Main Sekarang <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                     </div>
                   </Link>
 
@@ -148,10 +163,10 @@ export default function MediaPage() {
                 <div className="flex flex-col items-center mb-8">
                   <Globe className="h-12 w-12 text-primary dark:text-gold mb-4" />
                   <h3 className="font-title text-2xl font-bold text-gray-800 dark:text-white mb-2">Media Realita</h3>
-                  <p className="font-desc text-gray-500 max-w-md">Eksplorasi simulasi interaktif tentang struktur ketatanegaraan dan proses hukum di dunia nyata.</p>
+                  <p className="font-desc text-gray-500 max-w-8xl">Eksplorasi simulasi interaktif tentang struktur ketatanegaraan dan proses hukum di dunia nyata.</p>
                 </div>
 
-                <div className="flex justify-center w-full max-w-3xl mx-auto">
+                <div className="flex justify-center w-full max-w-8xl mx-auto">
                   <Link href="/media/realita" className="group flex flex-col items-center text-center p-8 rounded-2xl border-2 border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900/50 hover:border-primary dark:hover:border-gold hover:shadow-xl transition-all duration-300 w-full md:w-1/2">
                     <div className="h-16 w-16 rounded-full bg-primary/10 dark:bg-gold/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                       <Globe className="h-8 w-8 text-primary dark:text-gold" />

@@ -2,7 +2,7 @@
 import { unstable_cache } from "next/cache";
 import { createAdminClient, APPWRITE_CONFIG } from "@/lib/appwrite";
 import { Query } from "node-appwrite";
-import { EducationLevel, Grade, Topic, Material, Quiz } from "@/data/ppkn";
+import { EducationLevel, Grade, Topic, Material, Quiz, AudioVisualMedia } from "@/data/ppkn";
 
 // Mappers (Appwrite Document -> DTO)
 const mapLevel = (doc: any): EducationLevel => ({
@@ -58,6 +58,17 @@ const mapQuiz = (doc: any): Quiz => ({
   options: doc.options,
   correct_answer: doc.correct_answer,
   explanation: doc.explanation,
+  is_active: doc.is_active,
+});
+
+const mapAudioVisual = (doc: any): AudioVisualMedia => ({
+  id: doc.$id,
+  title: doc.title,
+  url: doc.url,
+  type: doc.type,
+  level_id: doc.level_id,
+  grade_id: doc.grade_id,
+  order: doc.order,
   is_active: doc.is_active,
 });
 
@@ -221,5 +232,24 @@ export class PPKnService {
     },
     ['quiz-by-id'],
     { revalidate: 3600, tags: ['quizzes'] }
+  );
+
+  static getActiveAudioVisuals = unstable_cache(
+    async (type?: "motivation" | "song"): Promise<AudioVisualMedia[]> => {
+      const { dbId, colAudioVisuals } = APPWRITE_CONFIG;
+      const queries = [
+        Query.equal("is_active", true),
+        Query.orderAsc("order"),
+      ];
+      
+      if (type) {
+        queries.push(Query.equal("type", type));
+      }
+
+      const response = await createAdminClient().databases.listDocuments(dbId, colAudioVisuals, queries);
+      return response.documents.map(mapAudioVisual);
+    },
+    ['active-audio-visuals'],
+    { revalidate: 3600, tags: ['audio-visuals'] }
   );
 }

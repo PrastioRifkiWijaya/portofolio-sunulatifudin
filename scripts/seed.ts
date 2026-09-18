@@ -59,6 +59,29 @@ const dummyQuizzes = [
   { id: "quiz_smk_10_4", grade_id: "grade_smk_10", question: "Kewajiban utama warga negara muda dalam mengisi kemerdekaan melalui jalur pendidikan vokasi adalah...", options: ["Mencari kerja di luar negeri", "Meningkatkan kompetensi memajukan industri", "Berhenti belajar setelah lulus", "Hanya menuntut hak upah"], correct_answer: 1, explanation: "Meningkatkan keterampilan vokasi berguna untuk kemandirian ekonomi dan kemajuan industri bangsa (bela negara).", is_active: true },
   { id: "quiz_smk_10_5", grade_id: "grade_smk_10", question: "Jika ada perselisihan kerja, penyelesaian terbaik sesuai Pancasila adalah melalui...", options: ["Pemogokan massal", "Musyawarah Mufakat", "Pengadilan langsung", "Arbitrase internasional"], correct_answer: 1, explanation: "Musyawarah mufakat (Sila Keempat) adalah cara utama bangsa Indonesia dalam menyelesaikan masalah.", is_active: true }
 ];
+
+const videoMotivasiLinks = [
+  "https://youtu.be/HpgOO46OZ-Q?si=K9i43psyelQdsFY2",
+  "https://youtu.be/tXC82whyuzI?si=EqOr0hrvJjwZvJu5",
+  "https://youtu.be/8A3HQQu7jUY?si=hocwM0IXu_dflwZW",
+  "https://youtu.be/fRhbXHuKwsE?si=irhumhcykwReI-3b",
+  "https://youtu.be/97xZbxrmHhs?si=79c8QB_YYlQHVffl",
+  "https://youtu.be/QjcKBHADPVM?si=94nj5SH4KbogMXlj",
+  "https://youtu.be/kkW1AtwXe-E?si=WyQ5WKpBI95C3Q66",
+  "https://youtu.be/f5V2yGgJjbM?si=2v__cT-qZToVofj5"
+];
+
+const laguLinks = [
+  "https://youtu.be/JTZhCGbsCSI?si=aVE_9B9lAailWwNF",
+  "https://youtu.be/pE4qtESRPVI?si=KsxU2ckxkxq84q9r",
+  "https://youtu.be/7K7FAalftN4?si=hCSZ0wNC8zQxgzuc",
+  "https://youtu.be/uMURsCXEnGA?si=HwrroxDSIKnJh449",
+  "https://youtu.be/A2Uccg2OMtc?si=-jjPQXWWgdP2QGx2",
+  "https://youtu.be/ayRrrRBHkDg?si=g43XJTtyDSdbHtgt",
+  "https://youtu.be/cQJDGU7ygxo?si=vHooeA7Kn4aHavtj",
+  "https://youtu.be/J2p9Vytbm1Q?si=H1TWj33ApmLHySqP",
+  "https://youtu.be/LcghTxm-Qno?si=bMJBySpbHXcjOc3F"
+];
 import dotenv from "dotenv";
 
 dotenv.config({ path: ".env.local" });
@@ -85,8 +108,22 @@ const colGrades = process.env.APPWRITE_GRADES_COLLECTION_ID!;
 const colTopics = process.env.APPWRITE_TOPICS_COLLECTION_ID!;
 const colMaterials = process.env.APPWRITE_MATERIALS_COLLECTION_ID!;
 const colQuizzes = process.env.APPWRITE_QUIZZES_COLLECTION_ID!;
+const colAudioVisuals = process.env.APPWRITE_AUDIO_VISUAL_COLLECTION_ID!;
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+async function fetchYoutubeTitle(url: string): Promise<string> {
+  try {
+    const res = await fetch(`https://www.youtube.com/oembed?url=${url}&format=json`);
+    if (res.ok) {
+      const data = await res.json();
+      return data.title || "Video";
+    }
+  } catch (e) {
+    console.error(`Failed to fetch title for ${url}`, e);
+  }
+  return "Video Pembelajaran";
+}
 
 async function ensureDatabase() {
   try {
@@ -280,6 +317,22 @@ async function main() {
   await createIndex(colQuizzes, "idx_grade_id", ["grade_id"]);
   await createIndex(colQuizzes, "idx_is_active", ["is_active"]);
   
+  // 6. Audio Visuals
+  if (colAudioVisuals) {
+    await ensureCollection(colAudioVisuals, "Audio Visuals");
+    await createAttribute(colAudioVisuals, "string", "title", 255, true);
+    await createAttribute(colAudioVisuals, "string", "url", 1000, true);
+    await createAttribute(colAudioVisuals, "string", "type", 50, true);
+    await createAttribute(colAudioVisuals, "string", "level_id", 50, false);
+    await createAttribute(colAudioVisuals, "string", "grade_id", 50, false);
+    await createAttribute(colAudioVisuals, "integer", "order", undefined, true);
+    await createAttribute(colAudioVisuals, "boolean", "is_active", undefined, true);
+    await createAttribute(colAudioVisuals, "datetime", "created_at", undefined, true);
+    await createAttribute(colAudioVisuals, "datetime", "updated_at", undefined, true);
+    await createIndex(colAudioVisuals, "idx_type", ["type"]);
+    await createIndex(colAudioVisuals, "idx_is_active_av", ["is_active"]);
+  }
+
   // Wait a moment for all attributes to be fully initialized before creating indexes / seeding data
   console.log("Waiting for indexes to propagate...");
   await sleep(3000);
@@ -293,6 +346,9 @@ async function main() {
   await databases.updateCollection(dbId, colTopics, "Topics", publicRead);
   await databases.updateCollection(dbId, colMaterials, "Materials", publicRead);
   await databases.updateCollection(dbId, colQuizzes, "Quizzes", publicRead);
+  if (colAudioVisuals) {
+    await databases.updateCollection(dbId, colAudioVisuals, "Audio Visuals", publicRead);
+  }
 
   // SEED DATA
   console.log("\nSeeding Education Levels...");
@@ -310,7 +366,43 @@ async function main() {
   console.log("\nSeeding Quizzes...");
   await seedData(colQuizzes, dummyQuizzes);
 
+  if (colAudioVisuals) {
+    console.log("\nFetching titles and Seeding Audio Visuals...");
+    const audioVisualData = [];
+    
+    let orderMotivasi = 1;
+    for (const link of videoMotivasiLinks) {
+      const title = await fetchYoutubeTitle(link);
+      audioVisualData.push({
+        id: `av_motivasi_${orderMotivasi}`,
+        title,
+        url: link,
+        type: "motivation",
+        order: orderMotivasi,
+        is_active: true
+      });
+      orderMotivasi++;
+    }
+
+    let orderLagu = 1;
+    for (const link of laguLinks) {
+      const title = await fetchYoutubeTitle(link);
+      audioVisualData.push({
+        id: `av_lagu_${orderLagu}`,
+        title,
+        url: link,
+        type: "song",
+        order: orderLagu,
+        is_active: true
+      });
+      orderLagu++;
+    }
+
+    await seedData(colAudioVisuals, audioVisualData);
+  }
+
   console.log("\n✅ Seed completed successfully!");
 }
+
 
 main().catch(console.error);

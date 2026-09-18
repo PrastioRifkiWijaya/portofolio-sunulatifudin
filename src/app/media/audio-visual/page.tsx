@@ -1,16 +1,19 @@
 import { Section } from "@/components/Section";
 import Link from "next/link";
-import { ArrowLeft, MonitorPlay } from "lucide-react";
+import { ArrowLeft, MonitorPlay, PlayCircle, Music } from "lucide-react";
 import { PPKnService } from "@/services/ppkn.service";
+import { AudioVisualCard } from "@/components/media/AudioVisualCard";
 
 export const dynamic = "force-dynamic";
 
 export default async function AudioVisualLevelPage() {
   const levels = await PPKnService.getActiveLevels();
+  const motivationVideos = await PPKnService.getActiveAudioVisuals("motivation");
+  const songs = await PPKnService.getActiveAudioVisuals("song");
 
   return (
-    <Section className="min-h-[80vh] py-16 md:py-24">
-      <div className="max-w-4xl mx-auto space-y-12">
+    <Section className="min-h-[80vh] py-16 md:py-24 bg-gray-50/50 dark:bg-background">
+      <div className="max-w-6xl mx-auto space-y-16">
         
         <Link href="/media" className="inline-flex items-center text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-gold transition-colors">
           <ArrowLeft className="h-4 w-4 mr-2" />
@@ -56,6 +59,49 @@ export default async function AudioVisualLevelPage() {
                 </div>
               </Link>
             ))}
+          </div>
+        )}
+
+
+        {/* Motivation Videos Section */}
+        {motivationVideos.length > 0 && (
+          <div className="space-y-8 pt-8 border-t border-gray-200 dark:border-gray-800">
+            <div className="flex items-center gap-4 mb-8">
+              <div className="w-12 h-12 bg-primary/10 dark:bg-gold/10 text-primary dark:text-gold rounded-xl flex items-center justify-center">
+                <PlayCircle className="w-6 h-6" />
+              </div>
+              <div>
+                <h2 className="font-title text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Video Motivasi Pembelajaran</h2>
+                <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Kumpulan video untuk menumbuhkan motivasi belajar dan wawasan kebangsaan.</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {motivationVideos.map((video) => (
+                <AudioVisualCard key={video.id} media={video} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Songs Section */}
+        {songs.length > 0 && (
+          <div className="space-y-8 pt-8 border-t border-gray-200 dark:border-gray-800">
+            <div className="flex items-center gap-4 mb-8">
+              <div className="w-12 h-12 bg-primary/10 dark:bg-gold/10 text-primary dark:text-gold rounded-xl flex items-center justify-center">
+                <Music className="w-6 h-6" />
+              </div>
+              <div>
+                <h2 className="font-title text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Lagu Pembelajaran & Wajib Nasional</h2>
+                <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Dengarkan lagu-lagu inspiratif untuk meningkatkan semangat kebangsaan.</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {songs.map((song) => (
+                <AudioVisualCard key={song.id} media={song} />
+              ))}
+            </div>
           </div>
         )}
 

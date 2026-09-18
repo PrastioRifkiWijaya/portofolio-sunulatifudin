@@ -60,3 +60,14 @@ export interface PublicQuiz {
   options: string[];
   explanation: string;
 }
+
+export interface AudioVisualMedia {
+  id: string;
+  title: string;
+  url: string;
+  type: "motivation" | "song";
+  level_id?: string;
+  grade_id?: string;
+  order: number;
+  is_active: boolean;
+}

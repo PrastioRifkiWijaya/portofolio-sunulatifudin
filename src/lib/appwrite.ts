@@ -44,5 +44,8 @@ export const APPWRITE_CONFIG = {
   get colQuizzes() {
     return getRequiredEnv("APPWRITE_QUIZZES_COLLECTION_ID");
   },
+  get colAudioVisuals() {
+    return getRequiredEnv("APPWRITE_AUDIO_VISUAL_COLLECTION_ID");
+  },
 };
 
