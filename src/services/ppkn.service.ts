@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { unstable_cache } from "next/cache";
 import { createAdminClient, APPWRITE_CONFIG } from "@/lib/appwrite";
 import { Query } from "node-appwrite";
 import { EducationLevel, Grade, Topic, Material, Quiz, AudioVisualMedia } from "@/data/ppkn";
@@ -73,183 +72,136 @@ const mapAudioVisual = (doc: any): AudioVisualMedia => ({
 });
 
 export class PPKnService {
-  static getActiveLevels = unstable_cache(
-    async (): Promise<EducationLevel[]> => {
-      const { dbId, colLevels } = APPWRITE_CONFIG;
-      const response = await createAdminClient().databases.listDocuments(dbId, colLevels, [
-        Query.equal("is_active", true),
-        Query.orderAsc("order"),
-      ]);
-      return response.documents.map(mapLevel);
-    },
-    ['active-levels'],
-    { revalidate: 3600, tags: ['levels'] }
-  );
+  static async getActiveLevels(): Promise<EducationLevel[]> {
+    const { dbId, colLevels } = APPWRITE_CONFIG;
+    const response = await createAdminClient().databases.listDocuments(dbId, colLevels, [
+      Query.equal("is_active", true),
+      Query.orderAsc("order"),
+    ]);
+    return response.documents.map(mapLevel);
+  }
 
-  static getLevelByCode = unstable_cache(
-    async (levelCode: string): Promise<EducationLevel | null> => {
-      const { dbId, colLevels } = APPWRITE_CONFIG;
-      const response = await createAdminClient().databases.listDocuments(dbId, colLevels, [
-        Query.equal("code", levelCode.toUpperCase()),
-        Query.limit(1)
-      ]);
-      if (response.documents.length === 0) return null;
-      return mapLevel(response.documents[0]);
-    },
-    ['level-by-code'],
-    { revalidate: 3600, tags: ['levels'] }
-  );
+  static async getLevelByCode(levelCode: string): Promise<EducationLevel | null> {
+    const { dbId, colLevels } = APPWRITE_CONFIG;
+    const response = await createAdminClient().databases.listDocuments(dbId, colLevels, [
+      Query.equal("code", levelCode.toUpperCase()),
+      Query.limit(1)
+    ]);
+    if (response.documents.length === 0) return null;
+    return mapLevel(response.documents[0]);
+  }
 
-  static getActiveGrades = unstable_cache(
-    async (levelId: string): Promise<Grade[]> => {
-      const { dbId, colGrades } = APPWRITE_CONFIG;
-      const response = await createAdminClient().databases.listDocuments(dbId, colGrades, [
-        Query.equal("level_id", levelId),
-        Query.equal("is_active", true),
-        Query.orderAsc("order"),
-      ]);
-      return response.documents.map(mapGrade);
-    },
-    ['active-grades'],
-    { revalidate: 3600, tags: ['grades'] }
-  );
+  static async getActiveGrades(levelId: string): Promise<Grade[]> {
+    const { dbId, colGrades } = APPWRITE_CONFIG;
+    const response = await createAdminClient().databases.listDocuments(dbId, colGrades, [
+      Query.equal("level_id", levelId),
+      Query.equal("is_active", true),
+      Query.orderAsc("order"),
+    ]);
+    return response.documents.map(mapGrade);
+  }
 
-  static getGradeByCode = unstable_cache(
-    async (gradeCode: string, levelId: string): Promise<Grade | null> => {
-      const { dbId, colGrades } = APPWRITE_CONFIG;
-      const response = await createAdminClient().databases.listDocuments(dbId, colGrades, [
-        Query.equal("code", gradeCode.toUpperCase()),
-        Query.equal("level_id", levelId),
-        Query.limit(1)
-      ]);
-      if (response.documents.length === 0) return null;
-      return mapGrade(response.documents[0]);
-    },
-    ['grade-by-code'],
-    { revalidate: 3600, tags: ['grades'] }
-  );
+  static async getGradeByCode(gradeCode: string, levelId: string): Promise<Grade | null> {
+    const { dbId, colGrades } = APPWRITE_CONFIG;
+    const response = await createAdminClient().databases.listDocuments(dbId, colGrades, [
+      Query.equal("code", gradeCode.toUpperCase()),
+      Query.equal("level_id", levelId),
+      Query.limit(1)
+    ]);
+    if (response.documents.length === 0) return null;
+    return mapGrade(response.documents[0]);
+  }
 
-  static getActiveTopics = unstable_cache(
-    async (gradeId: string): Promise<Topic[]> => {
-      const { dbId, colTopics } = APPWRITE_CONFIG;
-      const response = await createAdminClient().databases.listDocuments(dbId, colTopics, [
-        Query.equal("grade_id", gradeId),
-        Query.equal("is_active", true),
-        Query.orderAsc("order"),
-      ]);
-      return response.documents.map(mapTopic);
-    },
-    ['active-topics'],
-    { revalidate: 3600, tags: ['topics'] }
-  );
+  static async getActiveTopics(gradeId: string): Promise<Topic[]> {
+    const { dbId, colTopics } = APPWRITE_CONFIG;
+    const response = await createAdminClient().databases.listDocuments(dbId, colTopics, [
+      Query.equal("grade_id", gradeId),
+      Query.equal("is_active", true),
+      Query.orderAsc("order"),
+    ]);
+    return response.documents.map(mapTopic);
+  }
 
-  static getTopicBySlug = unstable_cache(
-    async (topicSlug: string, gradeId: string): Promise<Topic | null> => {
-      const { dbId, colTopics } = APPWRITE_CONFIG;
-      const response = await createAdminClient().databases.listDocuments(dbId, colTopics, [
-        Query.equal("slug", topicSlug.toLowerCase()),
-        Query.equal("grade_id", gradeId),
-        Query.limit(1)
-      ]);
-      if (response.documents.length === 0) return null;
-      return mapTopic(response.documents[0]);
-    },
-    ['topic-by-slug'],
-    { revalidate: 3600, tags: ['topics'] }
-  );
+  static async getTopicBySlug(topicSlug: string, gradeId: string): Promise<Topic | null> {
+    const { dbId, colTopics } = APPWRITE_CONFIG;
+    const response = await createAdminClient().databases.listDocuments(dbId, colTopics, [
+      Query.equal("slug", topicSlug.toLowerCase()),
+      Query.equal("grade_id", gradeId),
+      Query.limit(1)
+    ]);
+    if (response.documents.length === 0) return null;
+    return mapTopic(response.documents[0]);
+  }
 
-  static getActiveMaterials = unstable_cache(
-    async (topicId: string, contentType?: string): Promise<Material[]> => {
-      const { dbId, colMaterials } = APPWRITE_CONFIG;
-      const queries = [
-        Query.equal("topic_id", topicId),
-        Query.equal("is_active", true),
-        Query.orderAsc("order"),
-      ];
-      
-      if (contentType) {
-        queries.push(Query.equal("content_type", contentType));
-      }
+  static async getActiveMaterials(topicId: string, contentType?: string): Promise<Material[]> {
+    const { dbId, colMaterials } = APPWRITE_CONFIG;
+    const queries = [
+      Query.equal("topic_id", topicId),
+      Query.equal("is_active", true),
+      Query.orderAsc("order"),
+    ];
+    
+    if (contentType) {
+      queries.push(Query.equal("content_type", contentType));
+    }
 
-      const response = await createAdminClient().databases.listDocuments(dbId, colMaterials, queries);
-      return response.documents.map(mapMaterial);
-    },
-    ['active-materials'],
-    { revalidate: 3600, tags: ['materials'] }
-  );
+    const response = await createAdminClient().databases.listDocuments(dbId, colMaterials, queries);
+    return response.documents.map(mapMaterial);
+  }
 
-  static getActiveMaterialsByTopicIds = unstable_cache(
-    async (topicIds: string[], contentType?: string): Promise<Material[]> => {
-      if (!topicIds || topicIds.length === 0) return [];
-      
-      const { dbId, colMaterials } = APPWRITE_CONFIG;
-      
-      // Note: Appwrite's Query.equal accepts arrays for 'IN' queries (up to 100 items)
-      // Since a grade won't have 100+ topics, this is safe and prevents N+1
-      const queries = [
-        Query.equal("topic_id", topicIds),
-        Query.equal("is_active", true),
-        Query.orderAsc("order"),
-      ];
+  static async getActiveMaterialsByTopicIds(topicIds: string[], contentType?: string): Promise<Material[]> {
+    if (!topicIds || topicIds.length === 0) return [];
+    
+    const { dbId, colMaterials } = APPWRITE_CONFIG;
+    
+    const queries = [
+      Query.equal("topic_id", topicIds),
+      Query.equal("is_active", true),
+      Query.orderAsc("order"),
+    ];
 
-      if (contentType) {
-        queries.push(Query.equal("content_type", contentType));
-      }
+    if (contentType) {
+      queries.push(Query.equal("content_type", contentType));
+    }
 
-      // We might need to fetch a larger limit if there are many materials across topics
-      queries.push(Query.limit(100));
+    queries.push(Query.limit(100));
 
-      const response = await createAdminClient().databases.listDocuments(dbId, colMaterials, queries);
-      return response.documents.map(mapMaterial);
-    },
-    ['active-materials-by-topics'],
-    { revalidate: 3600, tags: ['materials'] }
-  );
+    const response = await createAdminClient().databases.listDocuments(dbId, colMaterials, queries);
+    return response.documents.map(mapMaterial);
+  }
 
-  static getActiveQuizzes = unstable_cache(
-    async (gradeId: string): Promise<Quiz[]> => {
-      const { dbId, colQuizzes } = APPWRITE_CONFIG;
-      const response = await createAdminClient().databases.listDocuments(dbId, colQuizzes, [
-        Query.equal("grade_id", gradeId),
-        Query.equal("is_active", true),
-        Query.limit(50), 
-      ]);
-      return response.documents.map(mapQuiz);
-    },
-    ['active-quizzes'],
-    { revalidate: 3600, tags: ['quizzes'] }
-  );
+  static async getActiveQuizzes(gradeId: string): Promise<Quiz[]> {
+    const { dbId, colQuizzes } = APPWRITE_CONFIG;
+    const response = await createAdminClient().databases.listDocuments(dbId, colQuizzes, [
+      Query.equal("grade_id", gradeId),
+      Query.equal("is_active", true),
+      Query.limit(50), 
+    ]);
+    return response.documents.map(mapQuiz);
+  }
 
-  static getQuizById = unstable_cache(
-    async (quizId: string): Promise<Quiz | null> => {
-      const { dbId, colQuizzes } = APPWRITE_CONFIG;
-      try {
-        const doc = await createAdminClient().databases.getDocument(dbId, colQuizzes, quizId);
-        return mapQuiz(doc);
-      } catch {
-        return null;
-      }
-    },
-    ['quiz-by-id'],
-    { revalidate: 3600, tags: ['quizzes'] }
-  );
+  static async getQuizById(quizId: string): Promise<Quiz | null> {
+    const { dbId, colQuizzes } = APPWRITE_CONFIG;
+    try {
+      const doc = await createAdminClient().databases.getDocument(dbId, colQuizzes, quizId);
+      return mapQuiz(doc);
+    } catch {
+      return null;
+    }
+  }
 
-  static getActiveAudioVisuals = unstable_cache(
-    async (type?: "motivation" | "song"): Promise<AudioVisualMedia[]> => {
-      const { dbId, colAudioVisuals } = APPWRITE_CONFIG;
-      const queries = [
-        Query.equal("is_active", true),
-        Query.orderAsc("order"),
-      ];
-      
-      if (type) {
-        queries.push(Query.equal("type", type));
-      }
+  static async getActiveAudioVisuals(type?: "motivation" | "song"): Promise<AudioVisualMedia[]> {
+    const { dbId, colAudioVisuals } = APPWRITE_CONFIG;
+    const queries = [
+      Query.equal("is_active", true),
+      Query.orderAsc("order"),
+    ];
+    
+    if (type) {
+      queries.push(Query.equal("type", type));
+    }
 
-      const response = await createAdminClient().databases.listDocuments(dbId, colAudioVisuals, queries);
-      return response.documents.map(mapAudioVisual);
-    },
-    ['active-audio-visuals'],
-    { revalidate: 3600, tags: ['audio-visuals'] }
-  );
+    const response = await createAdminClient().databases.listDocuments(dbId, colAudioVisuals, queries);
+    return response.documents.map(mapAudioVisual);
+  }
 }
