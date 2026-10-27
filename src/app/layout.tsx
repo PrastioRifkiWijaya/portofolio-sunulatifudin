@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "../components/ThemeProvider";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import GuidebookBanner from "@/components/banner/GuidebookBanner";
 import localFont from "next/font/local";
 
 const orborn = localFont({
@@ -53,6 +54,7 @@ export default function RootLayout({
         >
           <Navbar />
           <main className="grow pt-20">
+            <GuidebookBanner />
             {children}
           </main>
           <Footer />
